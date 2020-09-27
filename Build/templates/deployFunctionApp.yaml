@@ -20,7 +20,8 @@ steps:
       resourceGroupName: "cchatdemorg"
       slotName: "Staging"
 
-  - task: ManualIntervention@8
+  - task: ManualValidation@0
+    displayName: "Test Staging Slot"
     inputs:
+      notifyUsers: 'cchatangala@outlook.com'
       instructions: 'Test deployment slot.'
-      emailRecipients: 'cchatangala@outlook.com'      
