@@ -19,3 +19,8 @@ steps:
       deployToSlotOrASE: true
       resourceGroupName: "cchatdemorg"
       slotName: "Staging"
+
+  - task: ManualIntervention@8
+    inputs:
+      instructions: 'Test deployment slot.'
+      emailRecipients: 'cchatangala@outlook.com'      

@@ -41,6 +41,7 @@ namespace StocksApi.Services
             }
 
             var response = _mapper.Map<Stock, GetStockQuoteResponse>(stock);
+            response.Message = "This is a new feature!";
             return Result<GetStockQuoteResponse>.Success(response);
         }
     }

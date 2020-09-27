@@ -11,5 +11,6 @@
         public decimal CurrentPrice { get; set; }
 
         public decimal PreviousClosingPrice { get; set; }
+        public string Message { get; set; }
     }
 }
