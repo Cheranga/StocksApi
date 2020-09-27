@@ -6,7 +6,7 @@ steps:
       Action: 'Start Azure App Service'
       WebAppName: '$(functionAppName)'
       SpecifySlotOrASE: true
-      ResourceGroupName: $(resourceGroupName)
+      ResourceGroupName: "cchatdemoorg"
       Slot: Staging
 
   - task: AzureFunctionApp@1
