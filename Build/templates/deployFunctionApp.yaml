@@ -9,7 +9,6 @@ steps:
       ResourceGroupName: $(resourceGroupName)
       Slot: Staging
 
-steps:
   - task: AzureFunctionApp@1
     displayName: "Deploy Azure Function App"
     inputs:
