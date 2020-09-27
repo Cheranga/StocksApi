@@ -26,6 +26,7 @@
     },
     "variables": {
         "functionAppName": "[parameters('appName')]",
+        "slotName": "Staging",
         "hostingPlanName": "[concat(parameters('appName'),'asp')]",
         "applicationInsightsName": "[concat(parameters('appName'),'ins')]",
         "storageAccountName": "[toLower(replace(concat(parameters('appName'),'sg'),'-',''))]",
@@ -62,52 +63,86 @@
             }
         },
         {
-            "apiVersion": "2015-08-01",
             "type": "Microsoft.Web/sites",
+            "apiVersion": "2020-06-01",
             "name": "[variables('functionAppName')]",
-            "identity": {
-                "type": "SystemAssigned"
-            },
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-                "[resourceId('Microsoft.Web/serverfarms',variables('hostingPlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
             ],
+            "properties": {
+                "name": "[variables('functionAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('hostingPlanName'))]"
+            },
             "resources": [
+                // {
+                //     "name": "slotConfigNames",
+                //     "type": "config",
+                //     "apiVersion": "2015-08-01",
+                //     "dependsOn": [
+                //         "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+                //     ],
+                //     "tags": {
+                //         "displayName": "slotConfigNames"
+                //     },
+                //     "properties": {
+                //         "appSettingNames": [
+                //             "TemplatesApi:Url",
+                //             "TemplatesApi:ClientId"
+                //         ]
+                //     }
+                // },                
                 {
-                    "type": "config",
-                    "name": "appsettings",
                     "apiVersion": "2015-08-01",
+                    "name": "[variables('slotName')]",
+                    "type": "slots",
+                    "tags": {
+                        "displayName": "[concat(variables('slotName'), ' Deployment Slot')]"
+                    },
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', variables('functionAppName'))]"
+                    ],
+                    "properties": {},
+                    "resources": [
+                        {
+                            "apiVersion": "2015-08-01",
+                            "name": "appsettings",
+                            "type": "config",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
+                                "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
+                                "[resourceId('Microsoft.Web/sites/slots', variables('functionAppName'), variables('slotName'))]"
+                            ],
+                            "properties": {
+                                "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+                                "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1)]",
+                                "FUNCTIONS_EXTENSION_VERSION": "~3",
+                                "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1)]",
+                                "WEBSITE_CONTENTSHARE": "[concat(toLower(parameters('appName')), 'development')]",
+                                "WEBSITE_NODE_DEFAULT_VERSION": "6.5.0",
+                                "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
+                                "StockApi:Url": "[parameters('stockApi.Url')]",
+                                "StockApi:ApiKey": "[parameters('stockApi.ApiKey')]",
+                                "AzureWebJobsSecretStorageType": "Blob"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "apiVersion": "2015-08-01",
+                    "type": "config",
+                    "name": "web",
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
                     ],
                     "properties": {
-                        "WEBSITE_ENABLE_SYNC_UPDATE_SITE": "true",
-                        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
-                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
-                        "WEBSITE_CONTENTSHARE": "[toLower(variables('functionAppName'))]",
-                        "FUNCTIONS_EXTENSION_VERSION": "~3",
-                        "WEBSITE_NODE_DEFAULT_VERSION": "~10",
-                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]",
-                        "FUNCTIONS_WORKER_RUNTIME": "[variables('functionWorkerRuntime')]",
-                        "WEBSITE_TIME_ZONE": "[variables('timeZone')]",
-                        "StockApi:Url": "[parameters('stockApi.Url')]",
-                        "StockApi:ApiKey": "[parameters('stockApi.ApiKey')]"
+                        "use32BitWorkerProcess": false
                     }
                 }
-            ],
-            "properties": {
-                "serverFarmId": "[resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Web/serverFarms',variables('hostingPlanName'))]",
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~3"
-                        }
-                    ]
-                }
-            }
+            ]
         },
         {
             "apiVersion": "2018-05-01-preview",

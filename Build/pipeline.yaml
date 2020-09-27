@@ -46,3 +46,18 @@ stages:
         deploy:
           steps:
           - template: 'deploy.yaml'
+
+- stage: SWITCH
+  dependsOn: ['DEV']
+  jobs:
+  - deployment: DEV    
+    variables:
+    - template: 'variables/variables.dev.yaml'
+    pool:
+        vmImage: ${{variables.vmImage}}
+    environment: QTRDEV
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: 'switch.yaml'              

@@ -1,8 +1,22 @@
 steps:
-  - task: AzureFunctionApp@1
-    displayName: 'Deploy Azure Function App'
+  - task: AzureAppServiceManage@0
+    displayName: 'Start Staging Slot'
     inputs:
-      azureSubscription: '$(azureSubscription)'
+      azureSubscription: '$(azureSubscription)'    
+      Action: 'Start Azure App Service'
+      WebAppName: '$(functionAppName)'
+      SpecifySlotOrASE: true
+      ResourceGroupName: $(resourceGroupName)
+      Slot: Staging
+
+steps:
+  - task: AzureFunctionApp@1
+    displayName: "Deploy Azure Function App"
+    inputs:
+      azureSubscription: "$(azureSubscription)"
       appType: functionApp
-      appName: '$(functionAppName)'
-      package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+      appName: "$(functionAppName)/slots/Staging"
+      package: "$(Pipeline.Workspace)/drop/$(Build.BuildId).zip"
+      deployToSlotOrASE: true
+      resourceGroupName: "cchatdemoorg"
+      slotName: "Staging"

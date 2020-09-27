@@ -1,0 +1,19 @@
+steps:
+  - task: AzureAppServiceManage@0
+    displayName: 'Swap Slot'
+    inputs:
+      azureSubscription: '$(azureSubscription)'    
+      WebAppName: '$(functionAppName)'      
+      ResourceGroupName: 'cchatdemoorg'
+      SourceSlot: Staging
+      SwapWithProduction: true
+
+  - task: AzureAppServiceManage@0
+    displayName: 'Stop Slot'
+    inputs:
+      azureSubscription: '$(azureSubscription)'    
+      Action: 'Stop Azure App Service'
+      WebAppName: '$(functionAppName)'      
+      SpecifySlotOrASE: true
+      ResourceGroupName: 'cchatdemoorg'
+      Slot: Staging
