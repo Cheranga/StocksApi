@@ -6,7 +6,7 @@ steps:
       Action: 'Start Azure App Service'
       WebAppName: '$(functionAppName)'
       SpecifySlotOrASE: true
-      ResourceGroupName: "cchatdemoorg"
+      ResourceGroupName: "cchatdemorg"
       Slot: Staging
 
   - task: AzureFunctionApp@1
@@ -17,5 +17,5 @@ steps:
       appName: "$(functionAppName)/slots/Staging"
       package: "$(Pipeline.Workspace)/drop/$(Build.BuildId).zip"
       deployToSlotOrASE: true
-      resourceGroupName: "cchatdemoorg"
+      resourceGroupName: "cchatdemorg"
       slotName: "Staging"

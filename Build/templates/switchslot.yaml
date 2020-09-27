@@ -4,7 +4,7 @@ steps:
     inputs:
       azureSubscription: '$(azureSubscription)'    
       WebAppName: '$(functionAppName)'      
-      ResourceGroupName: 'cchatdemoorg'
+      ResourceGroupName: 'cchatdemorg'
       SourceSlot: Staging
       SwapWithProduction: true
 
@@ -15,5 +15,5 @@ steps:
       Action: 'Stop Azure App Service'
       WebAppName: '$(functionAppName)'      
       SpecifySlotOrASE: true
-      ResourceGroupName: 'cchatdemoorg'
+      ResourceGroupName: 'cchatdemorg'
       Slot: Staging
