@@ -14,7 +14,7 @@ steps:
     inputs:
       azureSubscription: "$(azureSubscription)"
       appType: functionApp
-      appName: "$(functionAppName)/slots/Staging"
+      appName: "$(functionAppName)/slots/"
       package: "$(Pipeline.Workspace)/drop/$(Build.BuildId).zip"
       deployToSlotOrASE: true
       resourceGroupName: "cchatdemorg"
