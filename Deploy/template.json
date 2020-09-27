@@ -71,7 +71,8 @@
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Web/serverfarms',variables('hostingPlanName'))]"
             ],
             "resources": [
                 {
@@ -81,7 +82,7 @@
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
                     ],
-                    "properties": {                                                
+                    "properties": {
                         "WEBSITE_ENABLE_SYNC_UPDATE_SITE": "true",
                         "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
                         "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
